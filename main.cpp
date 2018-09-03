@@ -1,11 +1,10 @@
 #include <iostream>
 #include <string.h>
 #include <fstream>
+#include "sha1.cpp"
 using namespace std;
 
 //this is wacc and theres probably a shorter/faster way to do this but it works
-//if you want to use login you have to make the password through newpass
-//only reason because the salt is really wacc
 
 bool firstrunn(){
     bool ret;
@@ -25,20 +24,11 @@ bool firstrunn(){
     return ret;
 }
 
-string newpass(string pass){
-    string tempass = "";
-    char w;
-    for (int i = 0; i < pass.length(); i++){
-        w = pass.at(i);
-        if(i % 2 == 0){
-            tempass += int(w)+1;
-        }
-        if(i % 2 != 0 || w == 'z'){
-            tempass += int(w)-1;
-        }
-    }
-
-    return tempass;
+string newpass(const string pass){
+    SHA1 checksum;
+    checksum.update(pass);
+    const string hash = checksum.final();
+    return hash;
 }
 
 bool login(string user, string pass){
@@ -46,14 +36,11 @@ bool login(string user, string pass){
     char y;
     string use = "";
     string pas = "";
-
     cout << "Login username:\n";
     cin >> use;
     cout << "Login password:\n";
     cin >> pas;
-
     pas = newpass(pas);
-
     if(pass == pas && use == user){
         isright = true;
     }else{
